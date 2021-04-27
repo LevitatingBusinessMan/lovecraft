@@ -7,9 +7,10 @@
 #include <errno.h>
 
 #define STORYFOLDER_PATH "stories"
-#define DEBUG 1
+#define DEBUG 0
 #define MIN_PAR_LENGTH 200
 #define MAX_PAR_LENGTH 3000
+#define SHOW_DETAILS 1
 
 typedef struct StoryNode {
 	char* filename;
@@ -34,25 +35,25 @@ int main(int argc, char *argv []) {
 	struct StoryNode *firstStory;
 	struct StoryNode *previousStory;
 
-	struct dirent *story;
-	while ((story=readdir(storyfolder))) {
+	struct dirent *story_entry;
+	while ((story_entry=readdir(storyfolder))) {
 		//Ignore . and ..
-		if (strcmp(story->d_name, ".") == 0 || strcmp(story->d_name, "..") == 0) {
+		if (strcmp(story_entry->d_name, ".") == 0 || strcmp(story_entry->d_name, "..") == 0) {
 			continue;
 		}
 
 		storycount++;
 		if (DEBUG) {
-			printf("Found story: %s\n", story->d_name);
+			printf("Found story: %s\n", story_entry->d_name);
 		}
 
 		if (storycount == 1) {
 			firstStory = malloc(sizeof(StoryNode));
-			firstStory->filename = story->d_name;
+			firstStory->filename = story_entry->d_name;
 			previousStory = firstStory;
 		} else {
 			struct StoryNode *Node = malloc(sizeof(StoryNode));
-			Node->filename = story->d_name;
+			Node->filename = story_entry->d_name;
 			previousStory->next = Node;
 			previousStory = Node;
 		}
@@ -95,7 +96,8 @@ int main(int argc, char *argv []) {
 		int length = index - last_newline;
 		if (length > MIN_PAR_LENGTH && length < MAX_PAR_LENGTH) {
 			struct Paragraph new_par;
-			new_par.begin = last_newline;
+			//This points to the first char of the paragraph, starting from index 1
+			new_par.begin = last_newline == 0 ? last_newline+1 : last_newline+2;
 			new_par.end = index;
 
 			paragraphs[pr_index] = new_par;
@@ -110,21 +112,27 @@ int main(int argc, char *argv []) {
 
 	struct Paragraph paragraph = paragraphs[random_index];
 
-	char *paragraph_str = malloc(paragraph.end - paragraph.begin);
+	char *paragraph_str = malloc(paragraph.end - paragraph.begin +1);
 
-	index = 0;
+	index = 1;
 	int str_index = 0;
 	rewind(storyfile);
 	//Read the file again, but this time save the random paragraph
 	while ((c = fgetc(storyfile)) != EOF) {
 		if (index > paragraph.end) break;
-		if (index > paragraph.begin) {
+		if (index >= paragraph.begin) {
 			paragraph_str[str_index] = c;
 			str_index++;
 		}
 		index++;
 	}
+	paragraph_str[str_index] = '\0';
 
-	printf("%s\n", paragraph_str);
+	if (SHOW_DETAILS) {
+		//I use \b to remove the ".txt"
+		printf("%s\n\n~ %s\b\b\b\b (%d:%d)\n", paragraph_str, storyfilename, paragraph.begin, paragraph.end);
+	} else {
+		printf("%s\n", paragraph_str);
+	}
 
 }
