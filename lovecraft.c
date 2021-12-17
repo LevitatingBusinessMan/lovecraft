@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#define STORYFOLDER_PATH "stories"
+#define STORYFOLDER_PATH "/usr/local/share/lovecraft"
 #define DEBUG 0
 #define MIN_PAR_LENGTH 200
 #define MAX_PAR_LENGTH 3000
