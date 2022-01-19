@@ -13,7 +13,7 @@ list_page = Nokogiri.HTML5 Net::HTTP.get(URI("https://hplovecraft.com/writings/t
 
 for story in list_page.css('tbody > tr:nth-child(3) > td > font > div > ul > ul:nth-child(2) > li > a')
 	name = story.inner_html
-	name.gsub!(/<\/?\w+.*>/, "") # sometimes there is <i> used in the title
+	name.gsub!(/<[^<>]+>/, "") # sometimes there is <i> used in the title
 	puts "Downloading \e[93m#{name}\e[0m"
 
 	uri = URI "https://hplovecraft.com/writings/texts/#{story["href"]}"
