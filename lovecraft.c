@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <ctype.h>
 
-#define STORYFOLDER_PATH "/usr/local/share/lovecraft"
+#define STORYFOLDER_PATH "/usr/share/lovecraft"
 #define DEBUG 0
 #define MIN_PAR_LENGTH 200
 #define MAX_PAR_LENGTH 3000
@@ -38,8 +38,8 @@ int main(int argc, char *argv []) {
 
 	struct dirent *story_entry;
 	while ((story_entry=readdir(storyfolder))) {
-		//Ignore . and ..
-		if (strcmp(story_entry->d_name, ".") == 0 || strcmp(story_entry->d_name, "..") == 0) {
+		//Ignore . and .. and any hidden files/folders
+		if (strncmp(story_entry->d_name, ".", 1) == 0) {
 			continue;
 		}
 
