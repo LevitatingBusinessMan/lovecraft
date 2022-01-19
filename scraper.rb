@@ -1,9 +1,11 @@
+#!/usr/bin/ruby
 require 'net/http'
 require 'nokogiri'
 require 'fileutils'
 
 DIR = Pathname.new (ENV["OUTPUT_DIR"] || "x")
 DOUBLE_NEWLINES = false
+INDENT = false
 
 FileUtils.mkdir_p DIR
 
@@ -19,7 +21,7 @@ for story in list_page.css('tbody > tr:nth-child(3) > td > font > div > ul > ul:
 
 	text = doc.css('tbody > tr:nth-child(3) > td > div > font > div').inner_html
 
-	text.gsub!("\n", "") # Remove all existing newlines (were used as wordwrap)
+	text.gsub!("\n", INDENT ? " " : "") # Remove all existing newlines (were used as wordwrap)
 
  	# I need to work with these so they can't be removed
 	text.gsub!("<center>", "{center}")
