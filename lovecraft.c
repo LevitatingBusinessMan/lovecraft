@@ -5,6 +5,7 @@
 #include <time.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <ctype.h>
 
 #define STORYFOLDER_PATH "/usr/local/share/lovecraft"
 #define DEBUG 0
@@ -127,6 +128,14 @@ int main(int argc, char *argv []) {
 		index++;
 	}
 	paragraph_str[str_index] = '\0';
+
+	//Skip over any leading whitespace (indentation)
+	for (int i=0; i < str_index; i++) {
+		if (!isspace(paragraph_str[i])) {
+			paragraph_str = paragraph_str+i;
+			break;
+		}
+	}
 
 	if (SHOW_DETAILS) {
 		//I use \b to remove the ".txt"
