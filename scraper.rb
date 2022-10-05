@@ -3,11 +3,13 @@ require 'net/http'
 require 'nokogiri'
 require 'fileutils'
 
-DIR = Pathname.new (ENV["OUTPUT_DIR"] || "x")
-DOUBLE_NEWLINES = false
+DIR = Pathname.new (ENV["OUTPUT_DIR"] || "out")
+DOUBLE_NEWLINES = true
 INDENT = false
 
 FileUtils.mkdir_p DIR
+
+puts "Writing to #{DIR}"
 
 list_page = Nokogiri.HTML5 Net::HTTP.get(URI("https://hplovecraft.com/writings/texts/"))
 
@@ -21,9 +23,10 @@ for story in list_page.css('tbody > tr:nth-child(3) > td > font > div > ul > ul:
 
 	text = doc.css('tbody > tr:nth-child(3) > td > div > font > div').inner_html
 
-	text.gsub!("\n", INDENT ? " " : "") # Remove all existing newlines (were used as wordwrap)
+	text.gsub!("\n\n", INDENT ? "  ": "") # Double newlines were used as indentation
+	text.gsub!("\n", " ") # Remove all existing newlines (were used as wordwrap)
 
- 	# I need to work with these so they can't be removed
+	# I need to work with these so they can't be removed
 	text.gsub!("<center>", "{center}")
 	text.gsub!("</center>", "{/center}")
 	text.gsub!("<br>", "{br}")
